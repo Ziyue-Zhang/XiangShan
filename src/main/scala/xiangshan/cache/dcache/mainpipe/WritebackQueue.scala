@@ -621,8 +621,8 @@ class WritebackQueue(edge: TLEdgeOut)(implicit p: Parameters) extends DCacheModu
   val miss_req_conflict = VecInit(entries.map(e => e.io.block_addr.valid && e.io.block_addr.bits === io.miss_req.bits)).asUInt.orR
   io.block_miss_req := io.miss_req.valid && miss_req_conflict
 
+  entries.foreach(_.io.mem_release.foreach(_.ready := false.B))
   TLArbiter.robin(edge, io.mem_release, entries.zipWithIndex.map(x => x._1.io.mem_release(x._2 % 4)):_*)
-  entries.foreach(_.io.mem_release.foreach(_.ready := io.mem_release.ready))
 
   // sanity check
   // print all input/output requests for debug purpose
